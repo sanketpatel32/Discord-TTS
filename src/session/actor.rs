@@ -203,7 +203,9 @@ impl GuildActor {
                 initial_human_count,
                 reply_tx,
             } => {
-                let res = self.handle_join(voice_channel_id, initial_human_count).await;
+                let res = self
+                    .handle_join(voice_channel_id, initial_human_count)
+                    .await;
                 let _ = reply_tx.send(res);
             }
             ActorCommand::Leave {

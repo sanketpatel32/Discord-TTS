@@ -69,7 +69,9 @@ pub async fn join(ctx: Context<'_>) -> Result<(), Error> {
         guild
             .voice_states
             .values()
-            .filter(|vs| vs.channel_id == Some(user_vc) && vs.user_id != ctx.cache().current_user().id)
+            .filter(|vs| {
+                vs.channel_id == Some(user_vc) && vs.user_id != ctx.cache().current_user().id
+            })
             .count()
             .max(1)
     } else {
