@@ -1,0 +1,40 @@
+app = "discord-tts-vcreader"
+primary_region = "sin"
+
+[build]
+
+[env]
+  RUST_LOG = "info"
+  OPENAI_MODEL = "gpt-realtime-2.1-mini"
+  OPENAI_REASONING_EFFORT = "minimal"
+  DEFAULT_VOICE = "marin"
+  ALLOWED_VOICES = "marin,cedar"
+  DATABASE_PATH = "/app/data/vc-reader.sqlite"
+  MAX_GUILDS = "4"
+  MAX_PENDING_PER_GUILD = "20"
+  MAX_CONCURRENT_GENERATIONS = "2"
+  MAX_TEXT_CHARS = "400"
+  MAX_TEXT_BYTES = "4096"
+  MAX_AUDIO_SECONDS = "30"
+  MAX_JOB_AGE_SECONDS = "60"
+  GENERATION_TIMEOUT_SECONDS = "20"
+  MAX_ATTEMPTS_PER_JOB = "2"
+  EMPTY_CHANNEL_TIMEOUT_SECONDS = "60"
+  OPENAI_IDLE_TIMEOUT_SECONDS = "120"
+  MONTHLY_BUDGET_USD = "30"
+  MONTHLY_BUDGET_RESERVE_USD = "0"
+  BUDGET_TIMEZONE = "Asia/Kolkata"
+  PRICE_TEXT_INPUT_PER_MILLION = "0.60"
+  PRICE_CACHED_TEXT_INPUT_PER_MILLION = "0.06"
+  PRICE_TEXT_OUTPUT_PER_MILLION = "2.40"
+  PRICE_AUDIO_OUTPUT_PER_MILLION = "20.00"
+  PRICING_VERIFIED_DATE = "2026-11-13"
+
+[mounts]
+  source = "vcreader_data"
+  destination = "/app/data"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
