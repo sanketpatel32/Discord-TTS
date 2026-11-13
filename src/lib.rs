@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::manual_is_multiple_of)]
+#![allow(clippy::chunks_exact_to_as_chunks)]
 
 pub mod audio;
 pub mod config;
