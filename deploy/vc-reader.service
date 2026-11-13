@@ -1,0 +1,41 @@
+[Unit]
+Description=Discord VC Reader Service
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vcreader
+Group=vcreader
+WorkingDirectory=/var/lib/vc-reader
+EnvironmentFile=/etc/vc-reader.env
+ExecStart=/usr/local/bin/vc-reader
+
+# Process and resource limits for <= 2GB VM
+Restart=on-failure
+RestartSec=5s
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+TimeoutStopSec=10s
+
+MemoryHigh=768M
+MemoryMax=1G
+CPUWeight=100
+TasksMax=64
+
+# Security and sandbox hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/vc-reader
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+# Structured logging
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
