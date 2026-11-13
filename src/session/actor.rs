@@ -41,6 +41,7 @@ pub enum ActorCommand {
     Join {
         voice_channel_id: u64,
         invoker_id: u64,
+        initial_human_count: usize,
         reply_tx: oneshot::Sender<Result<String, String>>,
     },
     Leave {
@@ -199,9 +200,10 @@ impl GuildActor {
             ActorCommand::Join {
                 voice_channel_id,
                 invoker_id: _,
+                initial_human_count,
                 reply_tx,
             } => {
-                let res = self.handle_join(voice_channel_id).await;
+                let res = self.handle_join(voice_channel_id, initial_human_count).await;
                 let _ = reply_tx.send(res);
             }
             ActorCommand::Leave {
@@ -330,7 +332,11 @@ impl GuildActor {
         self.queue.clear();
     }
 
-    async fn handle_join(&mut self, voice_channel_id: u64) -> Result<String, String> {
+    async fn handle_join(
+        &mut self,
+        voice_channel_id: u64,
+        initial_human_count: usize,
+    ) -> Result<String, String> {
         // Idempotent check
         if self.state == SessionState::Connected
             && self.active_voice_channel_id == Some(voice_channel_id)
@@ -352,17 +358,19 @@ impl GuildActor {
 
                 self.state = SessionState::Connected;
                 self.active_voice_channel_id = Some(voice_channel_id);
+                self.human_voice_member_count = initial_human_count.max(1);
+                self.empty_channel_deadline = None;
 
                 // Set cutoff snowflake to current time
                 let now_millis = Utc::now().timestamp_millis() as u64;
                 let snowflake = (now_millis.saturating_sub(1420070400000)) << 22;
                 self.activation_cutoff_message_id = snowflake;
-                self.empty_channel_deadline = None;
 
                 info!(
                     guild_id = self.guild_id,
                     vc_id = voice_channel_id,
                     epoch = self.session_epoch,
+                    human_count = self.human_voice_member_count,
                     "Joined voice channel and activated reading"
                 );
 

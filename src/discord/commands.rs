@@ -65,11 +65,23 @@ pub async fn join(ctx: Context<'_>) -> Result<(), Error> {
         }
     };
 
+    let initial_human_count = if let Some(guild) = ctx.cache().guild(guild_id) {
+        guild
+            .voice_states
+            .values()
+            .filter(|vs| vs.channel_id == Some(user_vc) && vs.user_id != ctx.cache().current_user().id)
+            .count()
+            .max(1)
+    } else {
+        1
+    };
+
     let (reply_tx, reply_rx) = oneshot::channel();
     actor_tx
         .send(ActorCommand::Join {
             voice_channel_id: user_vc.get(),
             invoker_id: ctx.author().id.get(),
+            initial_human_count,
             reply_tx,
         })
         .await
