@@ -9,13 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /usr/src/vc-reader
 
-# Cache dependencies
-COPY Cargo.toml Cargo.lock rust-toolchain.toml ./
-RUN mkdir src && echo "fn main() {}" > src/main.rs && echo "" > src/lib.rs
-RUN cargo build --release --locked || true
-RUN rm -rf src target/release/vc* target/release/deps/vc*
-
-# Copy full source and build release binary
+# Build release binary directly
 COPY . .
 RUN cargo build --release --locked
 
@@ -35,7 +29,7 @@ RUN useradd -m -u 1000 -U -s /bin/sh vcreader
 WORKDIR /app
 COPY --from=builder /usr/src/vc-reader/target/release/vc-reader /app/vc-reader
 COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh && chown -R vcreader:vcreader /app
+RUN sed -i 's/\r$//' /app/entrypoint.sh && chmod +x /app/entrypoint.sh && chown -R vcreader:vcreader /app
 
 VOLUME ["/app/data"]
 
